@@ -32,24 +32,35 @@ const client = new MongoClient(uri, {
   }
 });
 
-async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
-  }
-}
-run().catch(console.dir);
+//mongodb connection
+const dbConnect = async () => {
+    try {
+      client.connect();
+      console.log("DB Connected Successfully✅");
+    } catch (error) {
+      console.log(error.name, error.message);
+    }
+  };
+  dbConnect();
+  
+  const hotelRoomCollection = client.db("hotelBook").collection("hotelRooms");
+
+  //jwt auth related api
+  app.post('/jwt', async(req, res) => {
+    const user = req.body;
+    console.log(user);
+    const token = jwt.sign(user, 'secret', {expiresIn: '2h'})
+    res.send(token)
+  })
 
 
 
-
-
+  //just for checking
+  app.get("/data", async (req, res) => {
+    const cursor = hotelRoomCollection.find();
+    const result = await cursor.toArray();
+    res.send(result);
+  });
 
 
 app.get("/", (req, res) => {
