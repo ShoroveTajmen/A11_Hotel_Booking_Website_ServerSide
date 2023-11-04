@@ -9,7 +9,7 @@ const port = process.env.PORT || 5001;
 
 //middleware
 const corsOptions = {
-    origin: "*",
+    origin: ["http://localhost:5173"],
     credentials: true,
     optionSuccessStatus: 200,
 };
@@ -45,18 +45,25 @@ const dbConnect = async () => {
   
   const hotelRoomCollection = client.db("hotelBook").collection("hotelRooms");
 
-  //jwt auth related api
+  //jwt auth related api and send cookies to the client
   app.post('/jwt', async(req, res) => {
     const user = req.body;
     console.log(user);
-    const token = jwt.sign(user, 'secret', {expiresIn: '2h'})
-    res.send(token)
+    const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '2h'})
+    res
+    .cookie('token', token, {
+        httpOnly: true,
+        secure: false,
+        // sameSite: 'none'
+    })
+    .send({success: true})
   })
 
 
 
   //just for checking
-  app.get("/data", async (req, res) => {
+  app.get("/trydata", async (req, res) => {
+    console.log('tok took token', req.cookies.token)
     const cursor = hotelRoomCollection.find();
     const result = await cursor.toArray();
     res.send(result);
