@@ -55,8 +55,6 @@ const verifyToken = async(req, res, next) => {
 }
 
 
-
-
 //mongodb connection
 const dbConnect = async () => {
     try {
@@ -87,13 +85,30 @@ const dbConnect = async () => {
 
 
   //just for checking
-  app.get("/trydata", verifyToken, async (req, res) => {
-    // console.log('tok took token', req.cookies.token)
-    console.log('user in the valid token', req.user)
-    const cursor = hotelRoomCollection.find();
-    const result = await cursor.toArray();
-    res.send(result);
-  });
+//   app.get("/trydata", verifyToken, async (req, res) => {
+//     console.log(req.query.email);
+//     // console.log('tok took token', req.cookies.token)
+//     console.log('user in the valid token', req.user)
+//     if(req.query.email !== req.user.email){
+//         return res.status(403).send({message: 'forbidden access'})
+//     }
+//     let query = {};
+//     if(req.query?.email){
+//         query = {email: req.query.email}
+//     }
+//     const cursor = hotelRoomCollection.find(query);
+//     const result = await cursor.toArray();
+//     res.send(result);
+//   });
+
+
+//hotel room relted api
+//using get method to read the data what i stored in database
+    app.get("/roomData", async (req, res) => {
+        const cursor = hotelRoomCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+      });
 
 
 app.get("/", (req, res) => {
