@@ -32,6 +32,31 @@ const client = new MongoClient(uri, {
   }
 });
 
+
+//token verify middlewre
+const verifyToken = async(req, res, next) => {
+    const  token = req.cookies?.token;
+    console.log('tokennnn', token)
+    if(!token){
+        return res.status(401).send({message: 'not authorzied'})
+    }
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        //error
+        if(err){
+            console.log(err)
+            return res.status(401).send({message: 'unauthorized'})
+        }
+        //if token is valid then it would be decoded
+        console.log('value in the token', decoded)
+        req.user = decoded;
+        next()
+    })
+    
+}
+
+
+
+
 //mongodb connection
 const dbConnect = async () => {
     try {
@@ -62,8 +87,9 @@ const dbConnect = async () => {
 
 
   //just for checking
-  app.get("/trydata", async (req, res) => {
-    console.log('tok took token', req.cookies.token)
+  app.get("/trydata", verifyToken, async (req, res) => {
+    // console.log('tok took token', req.cookies.token)
+    console.log('user in the valid token', req.user)
     const cursor = hotelRoomCollection.find();
     const result = await cursor.toArray();
     res.send(result);
