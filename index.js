@@ -62,7 +62,12 @@ const dbConnect = async () => {
 };
 dbConnect();
 
+//create a database and database collection for all hotel rooms data
 const hotelRoomCollection = client.db("hotelBook").collection("hotelRooms");
+//create a database collection for room bookings
+const roomBookingsCollection = client
+  .db("hotelBook")
+  .collection("roomBookings");
 
 //jwt auth related api and send cookies to the client
 app.post("/jwt", async (req, res) => {
@@ -97,8 +102,7 @@ app.post("/jwt", async (req, res) => {
 //     res.send(result);
 //   });
 
-//hotel room relted api
-
+//hotel room related API
 //using get method to read the data what i stored in database
 app.get("/roomData", async (req, res) => {
   const cursor = hotelRoomCollection.find();
@@ -128,6 +132,22 @@ app.put("/roomdata/:id", async (req, res) => {
       $inc: { availability: -1 },
     }
   );
+});
+
+//room bookings related API
+//using get method to read room bookings data
+app.get("/roomBooks", async (req, res) => {
+  const cursor = roomBookingsCollection.find();
+  const result = await cursor.toArray();
+  res.send(result);
+});
+
+//using post method to store room bookings info to the database
+app.post("/roomBooks", async (req, res) => {
+  const roomBookingsData = req.body;
+  console.log(roomBookingsData);
+  const result = await roomBookingsCollection.insertOne(roomBookingsData);
+  res.send(result);
 });
 
 app.get("/", (req, res) => {
