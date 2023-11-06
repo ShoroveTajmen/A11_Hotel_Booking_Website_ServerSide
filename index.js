@@ -141,12 +141,26 @@ app.get("/roomBooks", async (req, res) => {
   const result = await cursor.toArray();
   res.send(result);
 });
+app.get("/roomBooks/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const result = await roomBookingsCollection.findOne(query);
+  res.send(result);
+});
 
 //using post method to store room bookings info to the database
 app.post("/roomBooks", async (req, res) => {
   const roomBookingsData = req.body;
   console.log(roomBookingsData);
   const result = await roomBookingsCollection.insertOne(roomBookingsData);
+  res.send(result);
+});
+
+//using delete method to delete specific room booking from database
+app.delete("/roomBooks/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const result = await roomBookingsCollection.deleteOne(query);
   res.send(result);
 });
 
