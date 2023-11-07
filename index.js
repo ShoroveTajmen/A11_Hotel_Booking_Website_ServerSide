@@ -132,6 +132,7 @@ app.put("/roomdata/:id", async (req, res) => {
       $inc: { availability: -1 },
     }
   );
+  res.send(result);
 });
 
 //room bookings related API
