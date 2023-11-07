@@ -68,6 +68,8 @@ const hotelRoomCollection = client.db("hotelBook").collection("hotelRooms");
 const roomBookingsCollection = client
   .db("hotelBook")
   .collection("roomBookings");
+//create a database collection for room review
+const roomReviewCollection = client.db("hotelBook").collection("roomReview");
 
 //jwt auth related api and send cookies to the client
 app.post("/jwt", async (req, res) => {
@@ -142,6 +144,7 @@ app.get("/roomBooks", async (req, res) => {
   const result = await cursor.toArray();
   res.send(result);
 });
+//get specific roomBooks data
 app.get("/roomBooks/:id", async (req, res) => {
   const id = req.params.id;
   const query = { _id: new ObjectId(id) };
@@ -162,6 +165,29 @@ app.delete("/roomBooks/:id", async (req, res) => {
   const id = req.params.id;
   const query = { _id: new ObjectId(id) };
   const result = await roomBookingsCollection.deleteOne(query);
+  res.send(result);
+});
+
+//Room review related API
+//using get method to read the roomReview what i stored in database
+app.get("/roomReview", async (req, res) => {
+  const cursor = roomReviewCollection.find();
+  const result = await cursor.toArray();
+  res.send(result);
+});
+//get method for getting specific rooms review
+app.get("/roomReview/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { roomId: id };
+  const result = await roomReviewCollection.find(query).toArray();
+  res.send(result);
+});
+
+//using post method to store roomReview data in the database
+app.post("/roomReview", async (req, res) => {
+  const review = req.body;
+  console.log(review);
+  const result = await roomReviewCollection.insertOne(review);
   res.send(result);
 });
 
