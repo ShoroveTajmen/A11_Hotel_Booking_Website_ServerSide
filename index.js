@@ -124,10 +124,10 @@ app.get("/roomData/:id", async (req, res) => {
 app.put("/roomdata/:id", async (req, res) => {
   const id = req.params.id;
   const room = await hotelRoomCollection.findOne({ _id: new ObjectId(id) });
-  if (room.availability <= 0) {
-    // Handle the case where availability is already at zero
-    return res.status(400).json({ error: "No available seats" });
-  }
+//   if (room.availability <= 0) {
+//     // Handle the case where availability is already at zero
+//     return res.status(400).json({ error: "No available seats" });
+//   }
   const result = await hotelRoomCollection.updateOne(
     { _id: new ObjectId(id) },
     {
@@ -159,6 +159,24 @@ app.post("/roomBooks", async (req, res) => {
   const result = await roomBookingsCollection.insertOne(roomBookingsData);
   res.send(result);
 });
+
+//using put method to update room booking date
+app.put("/roomBooks/:id", async(req, res) => {
+    const id = req.params.id;
+    const filter = {_id: new ObjectId(id)};
+    const options = {upsert: true};
+    const updatedDate = req.body;
+    const date = {
+        $set: {
+            selectedDate: updatedDate.selectedDate
+        },
+    };
+    const result = await roomBookingsCollection.updateOne(filter, date, options);
+    res.send(result);
+})
+
+
+
 
 //using delete method to delete specific room booking from database
 app.delete("/roomBooks/:id", async (req, res) => {
