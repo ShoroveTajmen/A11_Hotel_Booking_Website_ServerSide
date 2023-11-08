@@ -8,11 +8,6 @@ const app = express();
 const port = process.env.PORT || 5001;
 
 //middleware
-// const corsOptions = {
-//   origin: ["http://localhost:5173"],
-//   credentials: true,
-//   optionSuccessStatus: 200,
-// };
 app.use(
     cors({
       origin: ["http://localhost:5173", "http://wealthy-minute.surge.sh"],
@@ -77,20 +72,21 @@ const roomBookingsCollection = client
 //create a database collection for room review
 const roomReviewCollection = client.db("hotelBook").collection("roomReview");
 
-//jwt auth related api and send cookies to the client
+
+
+//JWT auth related api and send cookies to the client
 app.post("/jwt", async (req, res) => {
   const user = req.body;
   console.log(user);
   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "2h",
   });
-  res
-    .cookie("token", token, {
-      httpOnly: true,
-      secure: false,
-      // sameSite: 'none'
-    })
-    .send({ success: true });
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', 
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+
+}).send({success: true})
 });
 //for user log out
 app.post("/logout", async (req, res) => {
@@ -123,10 +119,6 @@ app.get("/roomData/:id", async (req, res) => {
 app.put("/roomdata/:id", async (req, res) => {
   const id = req.params.id;
   const room = await hotelRoomCollection.findOne({ _id: new ObjectId(id) });
-  //   if (room.availability <= 0) {
-  //     // Handle the case where availability is already at zero
-  //     return res.status(400).json({ error: "No available seats" });
-  //   }
   const result = await hotelRoomCollection.updateOne(
     { _id: new ObjectId(id) },
     {
@@ -135,6 +127,9 @@ app.put("/roomdata/:id", async (req, res) => {
   );
   res.send(result);
 });
+
+
+
 
 //room bookings related API
 //using get method to read room bookings data
@@ -154,7 +149,6 @@ app.get("/roomBooks", verifyToken, async (req, res) => {
     const result = await cursor.toArray();
     res.send(result);
   });
-
 
 
 //get specific roomBooks data
@@ -195,6 +189,7 @@ app.delete("/roomBooks/:id", async (req, res) => {
   const result = await roomBookingsCollection.deleteOne(query);
   res.send(result);
 });
+
 
 //Room review related API
 //using get method to read the roomReview what i stored in database
