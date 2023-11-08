@@ -8,12 +8,18 @@ const app = express();
 const port = process.env.PORT || 5001;
 
 //middleware
-const corsOptions = {
-  origin: ["http://localhost:5173"],
-  credentials: true,
-  optionSuccessStatus: 200,
-};
-app.use(cors(corsOptions));
+// const corsOptions = {
+//   origin: ["http://localhost:5173"],
+//   credentials: true,
+//   optionSuccessStatus: 200,
+// };
+app.use(
+    cors({
+      origin: ["http://localhost:5173", "http://wealthy-minute.surge.sh"],
+      credentials: true,
+    })
+  );
+// app.use(cors(corsOptions));
 
 //access post body and convert into json format
 app.use(express.json());
@@ -95,22 +101,7 @@ app.post("/logout", async (req, res) => {
   }
 });
 
-//just for checking
-//   app.get("/trydata", verifyToken, async (req, res) => {
-//     console.log(req.query.email);
-//     // console.log('tok took token', req.cookies.token)
-//     console.log('user in the valid token', req.user)
-//     if(req.query.email !== req.user.email){
-//         return res.status(403).send({message: 'forbidden access'})
-//     }
-//     let query = {};
-//     if(req.query?.email){
-//         query = {email: req.query.email}
-//     }
-//     const cursor = hotelRoomCollection.find(query);
-//     const result = await cursor.toArray();
-//     res.send(result);
-//   });
+
 
 //hotel room related API
 //using get method to read the data what i stored in database
